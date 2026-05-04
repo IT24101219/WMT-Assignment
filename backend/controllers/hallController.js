@@ -81,3 +81,9 @@ exports.updateHall = async (req, res) => {
   res.json({ success: true, hall });
 };
 
+// DELETE /api/halls/:id  (main_manager only)
+exports.deleteHall = async (req, res) => {
+  const hall = await Hall.findByIdAndDelete(req.params.id);
+  if (!hall) return res.status(404).json({ success: false, message: 'Hall not found.' });
+  res.json({ success: true, message: 'Hall deleted successfully.' });
+};
