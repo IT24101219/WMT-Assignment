@@ -37,3 +37,23 @@ exports.getHallById = async (req, res) => {
   res.json({ success: true, hall });
 };
 
+// POST /api/halls
+exports.createHall = async (req, res) => {
+  const { branch, name, screenType, rows, cols, seats } = req.body;
+
+  // Branch manager can only create in their own branch
+  if (req.user.role === 'branch_manager' &&
+    req.user.assignedBranch?.toString() !== branch?.toString()) {
+    return res.status(403).json({ success: false, message: 'You can only create halls in your assigned branch.' });
+  }
+
+  const layoutSeats = seats || buildDefaultLayout(rows || 8, cols || 12);
+  const hall = await Hall.create({
+    branch,
+    name,
+    screenType: screenType || '2D',
+    layoutConfig: { rows: rows || 8, cols: cols || 12, seats: layoutSeats },
+  });
+
+  res.status(201).json({ success: true, hall });
+};
