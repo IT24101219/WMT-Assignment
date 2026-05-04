@@ -57,3 +57,27 @@ exports.createHall = async (req, res) => {
 
   res.status(201).json({ success: true, hall });
 };
+
+// PUT /api/halls/:id  — Update layout (branch_manager for own branch, main_manager for any)
+exports.updateHall = async (req, res) => {
+  const hall = await Hall.findById(req.params.id);
+  if (!hall) return res.status(404).json({ success: false, message: 'Hall not found.' });
+
+  if (req.user.role === 'branch_manager' &&
+    req.user.assignedBranch?.toString() !== hall.branch.toString()) {
+    return res.status(403).json({ success: false, message: 'Access denied to this hall.' });
+  }
+
+  const { name, screenType, rows, cols, seats } = req.body;
+  if (name) hall.name = name;
+  if (screenType) hall.screenType = screenType;
+  if (seats) {
+    hall.layoutConfig.seats = seats;
+    if (rows) hall.layoutConfig.rows = rows;
+    if (cols) hall.layoutConfig.cols = cols;
+  }
+
+  await hall.save();
+  res.json({ success: true, hall });
+};
+
