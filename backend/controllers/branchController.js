@@ -34,3 +34,16 @@ exports.updateBranch = async (req, res) => {
   if (!branch) return res.status(404).json({ success: false, message: 'Branch not found.' });
   res.json({ success: true, branch });
 };
+
+// DELETE /api/branches/:id  — Soft delete (main_manager only)
+exports.deleteBranch = async (req, res) => {
+  const branch = await Branch.findById(req.params.id);
+  if (!branch) return res.status(404).json({ success: false, message: 'Branch not found.' });
+  if (branch.isDeleted) return res.status(400).json({ success: false, message: 'Branch already deleted.' });
+
+  branch.isDeleted = true;
+  branch.deletedAt = new Date();
+  await branch.save();
+
+  res.json({ success: true, message: 'Branch soft-deleted. Can be restored within 30 days.' });
+};
