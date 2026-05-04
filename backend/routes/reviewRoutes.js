@@ -11,4 +11,4 @@ router.put('/:id', protect, requireRole('customer'), ctrl.updateReview);
 router.put('/:id/moderate', protect, requireRole('branch_manager', 'main_manager'), ctrl.moderateReview);
 router.delete('/:id', protect, ctrl.deleteReview);
 
-module.exports = router;
+module.exports = router; 
