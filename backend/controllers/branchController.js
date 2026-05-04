@@ -47,3 +47,21 @@ exports.deleteBranch = async (req, res) => {
 
   res.json({ success: true, message: 'Branch soft-deleted. Can be restored within 30 days.' });
 };
+
+// POST /api/branches/:id/restore  — Undo soft delete (main_manager, within 30 days)
+exports.restoreBranch = async (req, res) => {
+  const branch = await Branch.findById(req.params.id);
+  if (!branch) return res.status(404).json({ success: false, message: 'Branch not found.' });
+  if (!branch.isDeleted) return res.status(400).json({ success: false, message: 'Branch is not deleted.' });
+
+  const daysSinceDelete = (Date.now() - new Date(branch.deletedAt)) / (1000 * 60 * 60 * 24);
+  if (daysSinceDelete > 30) {
+    return res.status(400).json({ success: false, message: 'Restore window has expired (30 days).' });
+  }
+
+  branch.isDeleted = false;
+  branch.deletedAt = null;
+  await branch.save();
+
+  res.json({ success: true, message: 'Branch restored successfully.', branch });
+};
