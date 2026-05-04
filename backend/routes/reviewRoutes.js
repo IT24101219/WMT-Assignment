@@ -1,7 +1,7 @@
 const express = require('express'); 
 const router = express.Router();
 const ctrl = require('../controllers/reviewController');
-const { protect, requireRole } = require('../middleware/authMiddleware');
+const { protect, requireRole } = require('../middleware/authMiddleware'); 
 
 router.get('/', protect, ctrl.getReviews);
 router.get('/stats/:movieId', protect, ctrl.getMovieStats);
