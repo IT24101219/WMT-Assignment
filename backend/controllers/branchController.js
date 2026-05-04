@@ -22,3 +22,15 @@ exports.createBranch = async (req, res) => {
   const branch = await Branch.create({ name, address, city, phone, manager });
   res.status(201).json({ success: true, branch });
 };
+
+// PUT /api/branches/:id  (main_manager only)
+exports.updateBranch = async (req, res) => {
+  const { name, address, city, phone, manager, imageUrl } = req.body;
+  const branch = await Branch.findByIdAndUpdate(
+    req.params.id,
+    { name, address, city, phone, manager, imageUrl },
+    { new: true, runValidators: true }
+  );
+  if (!branch) return res.status(404).json({ success: false, message: 'Branch not found.' });
+  res.json({ success: true, branch });
+};
