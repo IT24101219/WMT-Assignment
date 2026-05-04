@@ -18,7 +18,7 @@ exports.getReviews = async (req, res) => {
   if (req.user.role === 'customer') {
     reviews = reviews.map(r => {
       if (r.isBlurred) {  
-        r.comment = '[This review has been hidden by a moderator.]';
+        r.comment = '[This review has been hidden by a moderator.]';  
       }
       return r;
     });
